@@ -14,7 +14,7 @@ public class UnseaworthyCommon implements ModInitializer {
     public static final String MOD_ID = "unseaworthy";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static TagKey<Biome> OCEANS = TagKey.create(Registries.BIOME, new ResourceLocation("c", "ocean"));
+    public static TagKey<Biome> OCEANS = TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("c", "is_ocean"));
 
     @Override
     public void onInitialize() {

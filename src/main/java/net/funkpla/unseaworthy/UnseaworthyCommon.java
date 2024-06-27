@@ -1,15 +1,15 @@
-package net.funkpla.template;
+package net.funkpla.unseaworthy;
 
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Template implements ModInitializer {
+public class UnseaworthyCommon implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("template");
+    public static final Logger LOGGER = LoggerFactory.getLogger("unseaworthy");
 
 	@Override
 	public void onInitialize() {

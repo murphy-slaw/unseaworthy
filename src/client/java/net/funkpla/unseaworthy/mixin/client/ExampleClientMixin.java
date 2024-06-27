@@ -1,4 +1,4 @@
-package net.funkpla.template.mixin.client;
+package net.funkpla.unseaworthy.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;

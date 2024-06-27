@@ -1,6 +1,6 @@
-# Template Mod
+# Unseaworthy
 
-Description goes here.
+A mod that makes boats unsuitable for ocean voyages.
 
 ## Features
 ## Acknowledgements

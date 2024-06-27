@@ -1,4 +1,4 @@
-# Changelog for [Template](https://github.com/murphy-slaw/fabric_template)
+# Changelog for [Unseaworthy](https://github.com/murphy-slaw/unseaworthy)
 
 All notable changes to this project will be documented in this file.
 

@@ -1,34 +1,34 @@
 {
 	"schemaVersion": 1,
-	"id": "template",
+	"id": "unseaworthy",
 	"version": "${version}",
-	"name": "Template",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Unseaworthy",
+	"description": "A mod that makes boats unsuitable for ocean voyages.",
 	"authors": [
-		"Me!"
+		"murphy slaw"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/template/icon.png",
+	"icon": "assets/unseaworthy/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.funkpla.template.Template"
+			"net.funkpla.unseaworthy.UnseaworthyCommon"
 		],
 		"client": [
-			"net.funkpla.template.TemplateClient"
+          "net.funkpla.unseaworthy.UnseaworthyClient"
 		],
 		"fabric-datagen": [
-			"net.funkpla.template.TemplateDataGenerator"
+			"net.funkpla.unseaworthy.UnseaworthyDataGenerator"
 		]
 	},
 	"mixins": [
-		"template.mixins.json",
+		"unseaworthy.mixins.json",
 		{
-			"config": "template.client.mixins.json",
+			"config": "unseaworthy.client.mixins.json",
 			"environment": "client"
 		}
 	],

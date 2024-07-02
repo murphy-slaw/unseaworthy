@@ -1,44 +1,44 @@
 {
-	"schemaVersion": 1,
-	"id": "unseaworthy",
-	"version": "${version}",
-	"name": "Unseaworthy",
-	"description": "A mod that makes boats unsuitable for ocean voyages.",
-	"authors": [
-		"murphy slaw"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/unseaworthy/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"net.funkpla.unseaworthy.UnseaworthyCommon"
-		],
-		"client": [
-          "net.funkpla.unseaworthy.UnseaworthyClient"
-		],
-		"fabric-datagen": [
-			"net.funkpla.unseaworthy.UnseaworthyDataGenerator"
-		]
-	},
-	"mixins": [
-		"unseaworthy.mixins.json",
-		{
-			"config": "unseaworthy.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.20.1",
-		"java": ">=17",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "unseaworthy",
+  "version": "${version}",
+  "name": "Unseaworthy",
+  "description": "A mod that makes boats unsuitable for ocean voyages.",
+  "authors": [
+    "murphy slaw"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/unseaworthy",
+    "sources": "https://github.com/murphy-slaw/unseaworthy"
+  },
+  "license": "MIT",
+  "icon": "assets/unseaworthy/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.funkpla.unseaworthy.UnseaworthyCommon"
+    ],
+    "client": [
+      "net.funkpla.unseaworthy.UnseaworthyClient"
+    ],
+    "modmenu": [
+      "net.funkpla.unseaworthy.ModMenuConfig"
+    ]
+  },
+  "mixins": [
+    "unseaworthy.mixins.json",
+    {
+      "config": "unseaworthy.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
 }

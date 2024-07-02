@@ -1,8 +1,12 @@
 package net.funkpla.unseaworthy.mixin;
 
+import me.shedaniel.autoconfig.AutoConfig;
 import net.funkpla.unseaworthy.UnseaworthyCommon;
+import net.funkpla.unseaworthy.UnseaworthyConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -17,8 +21,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+
 @Mixin(Boat.class)
 public abstract class BoatMixin extends Entity {
+
+    @Unique
+    protected final UnseaworthyConfig config = AutoConfig.getConfigHolder(UnseaworthyConfig.class).getConfig();
 
     @Unique
     private int bounceTimer = 0;
@@ -45,6 +53,15 @@ public abstract class BoatMixin extends Entity {
     @Shadow
     public abstract Boat.Type getVariant();
 
+    @Shadow
+    protected abstract int getBubbleTime();
+
+    @Shadow
+    protected abstract void destroy(DamageSource damageSource);
+
+    @Shadow
+    private Boat.Status status;
+
     @Unique
     private boolean isSinking() {
         return this.isSinking;
@@ -68,13 +85,13 @@ public abstract class BoatMixin extends Entity {
     @Inject(at = @At("TAIL"), method = "tick")
     private void tickSinking(CallbackInfo info) {
         if (this.level().isClientSide()) return;
-        if (getStatus() == Boat.Status.IN_WATER) {
+        if (getStatus() != Boat.Status.UNDER_WATER) {
             if (this.shouldSink()) {
                 // By pretending we are above a downward column, the boat will break when bubbleTime expires
                 onAboveBubbleCol(true);
                 if (!isSinking()) {
                     setSinking(true);
-                    setBubbleTime(100);
+                    setBubbleTime(config.interval);
                 } else {
                     this.tryBounce();
                 }
@@ -107,16 +124,42 @@ public abstract class BoatMixin extends Entity {
         this.setDeltaMovement(vec3.x + (vec3.x * jitterX), vec3.y + (0.1 * this.random.nextInt(3, 5)), vec3.z + jitterZ);
     }
 
+
+    @Inject(method = "tickBubbleColumn", at = @At("HEAD"))
+    private void checkDestroy(CallbackInfo ci) {
+        if (this.isSinking() && this.getBubbleTime() <= 1) {
+            if (this.random.nextInt(100) > config.breakChance) {
+                this.setBubbleTime(config.interval);
+            } else {
+                //Get rid of any bounce impulse so it sinks immediately
+                Vec3 vec3 = this.getDeltaMovement();
+                this.setDeltaMovement(vec3.x, 0, vec3.z);
+            }
+        }
+    }
+
     //Only runs on server side
     @Inject(method = "tickBubbleColumn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;ejectPassengers()V"))
-    private void destroyBoat(CallbackInfo ci) {
+    private void sinkBoat(CallbackInfo ci) {
         if (isSinking()) {
-            this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
-            this.discard();
-            int spawnCount = this.random.nextInt(3, 5);
-            for (int i = 0; i < spawnCount; i++) {
-                this.spawnAtLocation(new ItemStack(this.getVariant().getPlanks()), 1);
-                this.spawnAtLocation(new ItemStack(Items.STICK), 1);
+            if (config.fate == UnseaworthyConfig.BoatFate.DESTROY) {
+                this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+                this.kill();
+                int spawnCount = this.random.nextInt(3, 5);
+                for (int i = 0; i < spawnCount; i++) {
+                    this.spawnAtLocation(new ItemStack(this.getVariant().getPlanks()), 1);
+                    this.spawnAtLocation(new ItemStack(Items.STICK), 1);
+                }
+            } else if (config.fate == UnseaworthyConfig.BoatFate.BREAK) {
+                this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+                this.kill();
+                this.destroy(new DamageSources(this.level().registryAccess()).drown());
+            } else if (config.fate == UnseaworthyConfig.BoatFate.SINK) {
+                if (this.getStatus() == Boat.Status.UNDER_WATER) {
+                    this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+                    this.setBubbleTime(0);
+                    setSinking(false);
+                }
             }
         }
     }

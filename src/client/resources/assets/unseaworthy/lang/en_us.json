@@ -1,0 +1,6 @@
+{
+  "text.autoconfig.unseaworthy.title": "Unseaworthy",
+  "text.autoconfig.unseaworthy.option.interval": "Destruction check interval (ticks)",
+  "text.autoconfig.unseaworthy.option.breakChance": "Chance boat will wreck (%)",
+  "text.autoconfig.unseaworthy.option.fate": "Fate of wrecked boats"
+}

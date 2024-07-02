@@ -1,5 +1,7 @@
 package net.funkpla.unseaworthy;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,5 +20,6 @@ public class UnseaworthyCommon implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        AutoConfig.register(UnseaworthyConfig.class, JanksonConfigSerializer::new);
     }
 }

@@ -8,10 +8,10 @@
     "murphy slaw"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://modrinth.com/mod/unseaworthy",
+    "sources": "https://github.com/murphy-slaw/unseaworthy"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/unseaworthy/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -21,8 +21,8 @@
     "client": [
       "net.funkpla.unseaworthy.UnseaworthyClient"
     ],
-    "fabric-datagen": [
-      "net.funkpla.unseaworthy.UnseaworthyDataGenerator"
+    "modmenu": [
+      "net.funkpla.unseaworthy.ModMenuConfig"
     ]
   },
   "mixins": [

@@ -1,10 +1,15 @@
 package net.funkpla.unseaworthy.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.funkpla.unseaworthy.UnseaworthyCommon;
 import net.funkpla.unseaworthy.UnseaworthyConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -25,16 +30,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class BoatMixin extends VehicleEntity {
 
     @Unique
+    private static final EntityDataAccessor<Integer> DATA_ID_SINK_TIME = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
+
+    @Inject(method = "defineSynchedData", at = @At("TAIL"))
+    protected void defineSinkTime(CallbackInfo ci, @Local(argsOnly = true) SynchedEntityData.Builder builder) {
+        builder.define(DATA_ID_SINK_TIME, 0);
+    }
+
+    @Unique
     protected final UnseaworthyConfig config = AutoConfig.getConfigHolder(UnseaworthyConfig.class).getConfig();
 
     @Unique
     private int bounceTimer = 0;
+
     @Unique
     private boolean isSinking = false;
 
-    @Shadow
-    private boolean isAboveBubbleColumn;
+    @Unique
+    private float sinkMultiplier;
 
+    @Shadow
+    private float bubbleAngle;
+
+    @Shadow
+    private float bubbleAngleO;
 
     public BoatMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -44,20 +63,21 @@ public abstract class BoatMixin extends VehicleEntity {
     protected abstract Boat.Status getStatus();
 
     @Shadow
-    protected abstract void setBubbleTime(int bubbleTime);
-
-    @Shadow
-    public abstract void onAboveBubbleCol(boolean downwards);
-
-    @Shadow
     public abstract Boat.Type getVariant();
 
-    @Shadow
-    protected abstract int getBubbleTime();
+    @Unique
+    private int getSinkTime() {
+        return this.entityData.get(DATA_ID_SINK_TIME);
+    }
+
+    @Unique
+    private void setSinkTime(int ticks) {
+        this.entityData.set(DATA_ID_SINK_TIME, ticks);
+    }
 
     @Unique
     private boolean isSinking() {
-        return this.isSinking;
+        return isSinking;
     }
 
     @Unique
@@ -65,32 +85,45 @@ public abstract class BoatMixin extends VehicleEntity {
         this.isSinking = b;
     }
 
-    /*
-    We pretend we are above a bubble column to get the jostling effect.
-     */
-    @Inject(method = "tickBubbleColumn", at = @At("HEAD"))
-    private void fakeBubbles(CallbackInfo ci) {
-        if (isSinking()) {
-            isAboveBubbleColumn = true;
+
+    @Inject(at = @At("HEAD"), method = "tickBubbleColumn", cancellable = true)
+    private void cancelBubbleColumn(CallbackInfo ci) {
+        if (this.isSinking()) {
+            ci.cancel();
         }
     }
 
-    @Inject(at = @At("TAIL"), method = "tick")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;tickBubbleColumn()V"), method = "tick")
     private void tickSinking(CallbackInfo info) {
-        if (this.level().isClientSide()) return;
-        if (getStatus() == Boat.Status.IN_WATER) {
-            if (this.shouldSink()) {
-                // By pretending we are above a downward column, the boat will break when bubbleTime expires
-                onAboveBubbleCol(true);
-                if (!isSinking()) {
-                    setSinking(true);
-                    setBubbleTime(config.interval);
+        int i = this.getSinkTime();
+        if (this.level().isClientSide()) {
+            if (i >= 0) {
+                this.sinkMultiplier += 0.01F;
+                if (this.random.nextInt(15) == 0) this.doWaterSplashEffect();
+            } else {
+                this.sinkMultiplier -= 0.1F;
+            }
+            this.sinkMultiplier = Mth.clamp(this.sinkMultiplier, 0.0F, 1.0F);
+            this.bubbleAngleO = this.bubbleAngle;
+            this.bubbleAngle = 15.0F * (float) Math.sin((double) (0.5F * (float) this.level().getGameTime())) * this.sinkMultiplier;
+
+        } else if (this.shouldSink() && getStatus() != Boat.Status.UNDER_WATER) {
+            if (!isSinking()) {
+                setSinking(true);
+                setSinkTime(config.interval);
+            } else if (this.getSinkTime() <= 0) {
+                if (this.random.nextInt(100) > config.breakChance) {
+                    this.setSinkTime(config.interval);
                 } else {
-                    this.tryBounce();
+                    this.sink();
                 }
             } else {
-                setSinking(false);
+                this.tryBounce();
+                this.setSinkTime(--i);
             }
+        } else {
+            setSinking(false);
+            setSinkTime(-1);
         }
     }
 
@@ -106,6 +139,7 @@ public abstract class BoatMixin extends VehicleEntity {
             return;
         }
         this.bounce();
+        this.doWaterSplashEffect();
         this.bounceTimer = 20 + this.random.nextInt(10);
     }
 
@@ -115,25 +149,11 @@ public abstract class BoatMixin extends VehicleEntity {
         float jitterX = (this.random.nextFloat() - 0.5F) * 0.2F;
         float jitterZ = (this.random.nextFloat() - 0.5F) * 0.2F;
         this.setDeltaMovement(vec3.x + (vec3.x * jitterX), vec3.y + (0.1 * this.random.nextInt(3, 5)), vec3.z + jitterZ);
+        this.setYRot(this.getYRot() + ((this.random.nextFloat() - 0.5F) * 90));
     }
 
-
-    @Inject(method = "tickBubbleColumn", at = @At("HEAD"))
-    private void checkDestroy(CallbackInfo ci) {
-        if (this.isSinking() && this.getBubbleTime() <= 1) {
-            if (this.random.nextInt(100) > config.breakChance) {
-                this.setBubbleTime(config.interval);
-            } else {
-                //Get rid of any bounce impulse so it sinks immediately
-                Vec3 vec3 = this.getDeltaMovement();
-                this.setDeltaMovement(vec3.x, 0, vec3.z);
-            }
-        }
-    }
-
-    //Only runs on server side
-    @Inject(method = "tickBubbleColumn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;ejectPassengers()V"))
-    private void sinkBoat(CallbackInfo ci) {
+    @Unique
+    private void sink() {
         if (isSinking()) {
             this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
             if (config.fate == UnseaworthyConfig.BoatFate.DESTROY) {
@@ -144,7 +164,12 @@ public abstract class BoatMixin extends VehicleEntity {
                     this.spawnAtLocation(new ItemStack(Items.STICK), 1);
                 }
             } else if (config.fate == UnseaworthyConfig.BoatFate.BREAK) {
+                this.kill();
                 this.destroy(new DamageSources(this.level().registryAccess()).drown());
+            } else if (config.fate == UnseaworthyConfig.BoatFate.SINK) {
+                this.ejectPassengers();
+                Vec3 vec3 = getDeltaMovement();
+                this.setDeltaMovement(vec3.x, -2, vec3.z);
             }
         }
     }

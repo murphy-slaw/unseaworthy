@@ -9,8 +9,12 @@ they enter an ocean biome, they begin to be tossed by the sea and eventually bre
 
 - Boats deployed on water begin shaking and bouncing upon entering ocean biomes (any biome in the `c:is_ocean`  biome
   tag).
-- Five seconds later, they are smashed to pieces.
-- They drop a few planks of the appropriate wood type and a few sticks.
+- A configurable number of ticks later, the boat is wrecked.
+- The % chance of being wrecked each interval is configurable.
+- Wrecked boats can be configured to:
+    - SINK: boat is pulled underwater and ejects passengers
+    - BREAK: boat is broken and drops its item entity
+    - DESTROY: boat is destroyed and drops a random number of planks and sticks
 
 ## Why would you want that?
 

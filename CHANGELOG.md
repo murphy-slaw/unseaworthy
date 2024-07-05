@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] 2024-07-04
+
+### Fixed
+
+So, uh, funny story. I made this mod to make boats less useful so that players would build the ships from the Small
+Ships mod. It turns out, those ships inherit from the vanilla Boat class, so they got all the behavior that I gave to
+boats. Which is to say, they sank.
+
+This release uses entity tags to limit the "sink in oceans" behavior to vanilla boats and chest boats.
+
 ## [1.1.0] 2024-07-03
 
 ### Added

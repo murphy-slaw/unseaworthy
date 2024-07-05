@@ -16,6 +16,15 @@ they enter an ocean biome, they begin to be tossed by the sea and eventually bre
     - BREAK: boat is broken and drops its item entity
     - DESTROY: boat is destroyed and drops a random number of planks and sticks
 
+(You can change which types of boat entities sink by overriding the entity tag defined
+in
+
+```
+unseaworthy/tags/entity_types/sinkable.json
+``` 
+
+with a data pack.)
+
 ## Why would you want that?
 
 I needed a way to encourage players to build actual ships in a mod pack that is all about ocean voyages. Boats are too

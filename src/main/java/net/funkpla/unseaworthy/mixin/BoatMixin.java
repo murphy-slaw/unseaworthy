@@ -98,6 +98,7 @@ public abstract class BoatMixin extends Entity {
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;tickBubbleColumn()V"), method = "tick")
     private void tickSinking(CallbackInfo info) {
+        if (!getType().is(UnseaworthyCommon.SINKABLE_BOATS)) return;
         int i = this.getSinkTime();
         if (this.level().isClientSide()) {
             if (i >= 0) {

@@ -130,7 +130,7 @@ public abstract class BoatMixin extends VehicleEntity {
 
     @Unique
     boolean shouldSink() {
-        return this.level().getBiome(blockPosition()).is(UnseaworthyCommon.OCEANS);
+        return this.level().getBiome(blockPosition()).is(UnseaworthyCommon.SINKS_BOATS);
     }
 
     @Unique

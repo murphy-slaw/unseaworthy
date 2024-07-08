@@ -3,10 +3,8 @@ package net.funkpla.unseaworthy.mixin;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.funkpla.unseaworthy.UnseaworthyCommon;
 import net.funkpla.unseaworthy.UnseaworthyConfig;
+import net.funkpla.unseaworthy.component.SinkTimeComponent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -25,17 +23,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static net.funkpla.unseaworthy.component.SinkTimeComponent.SINK_TIME;
+
 
 @Mixin(Boat.class)
 public abstract class BoatMixin extends Entity {
 
     @Unique
-    private static final EntityDataAccessor<Integer> DATA_ID_SINK_TIME = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
-
-    @Inject(method = "defineSynchedData", at = @At("TAIL"))
-    protected void defineSinkTime(CallbackInfo ci) {
-        this.entityData.define(DATA_ID_SINK_TIME, 0);
-    }
+    private final SinkTimeComponent sinkTime = SINK_TIME.get(this);
 
     @Unique
     protected final UnseaworthyConfig config = AutoConfig.getConfigHolder(UnseaworthyConfig.class).getConfig();
@@ -70,12 +65,12 @@ public abstract class BoatMixin extends Entity {
 
     @Unique
     private int getSinkTime() {
-        return this.entityData.get(DATA_ID_SINK_TIME);
+        return this.sinkTime.getValue();
     }
 
     @Unique
     private void setSinkTime(int ticks) {
-        this.entityData.set(DATA_ID_SINK_TIME, ticks);
+        this.sinkTime.setValue(ticks);
     }
 
     @Unique

@@ -20,6 +20,7 @@ public class UnseaworthyCommon implements ModInitializer {
     public static TagKey<Biome> SINKS_BOATS = TagKey.create(Registries.BIOME, locate("sinks_boats"));
     public static TagKey<EntityType<?>> SINKABLE_BOATS = TagKey.create(Registries.ENTITY_TYPE, locate("sinkable"));
 
+
     public static ResourceLocation locate(String path) {
         return new ResourceLocation(MOD_ID, path);
     }

@@ -23,6 +23,9 @@
     ],
     "modmenu": [
       "net.funkpla.unseaworthy.ModMenuConfig"
+    ],
+    "cardinal-components": [
+      "net.funkpla.unseaworthy.component.ComponentInitializer"
     ]
   },
   "mixins": [
@@ -32,6 +35,11 @@
       "environment": "client"
     }
   ],
+  "custom": {
+    "cardinal-components": [
+      "unseaworthy:sink_time"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.15.11",
     "minecraft": "~1.21",

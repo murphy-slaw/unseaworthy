@@ -16,14 +16,19 @@ they enter an ocean biome, they begin to be tossed by the sea and eventually bre
     - BREAK: boat is broken and drops its item entity
     - DESTROY: boat is destroyed and drops a random number of planks and sticks
 
-(You can change which types of boat entities sink by overriding the entity tag defined
-in
+## Datapack Stuff
+
+You can change which types of boat entities sink with the entity tag
 
 ```
 unseaworthy/tags/entity_types/sinkable.json
 ``` 
 
-with a data pack.)
+You can change which biomes cause boats to sink with the biome tag
+
+```
+unseaworthy/tags/worldgen/biome/sinks_boats.json
+```
 
 ## Why would you want that?
 

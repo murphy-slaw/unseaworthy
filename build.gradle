@@ -1,7 +1,7 @@
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
-    id "com.modrinth.minotaur" version "2.+"
+    id "me.modmuss50.mod-publish-plugin" version "0.5.2"
 }
 
 version = "${project.mod_version}+${minecraft_version}"
@@ -119,31 +119,39 @@ jar {
     }
 }
 
+publishMods {
+    file = remapJar.archiveFile
+    changelog = "Hello!"
+    type = STABLE
+    modLoaders.add("fabric")
+
+    curseforge {
+        projectId = "1061972"
+        projectSlug = "unseaworthy" // Required for discord webhook
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        minecraftVersions.add("${project.minecraft_version}")
+        requires("fabric-api")
+        requires("cloth-config")
+        requires("cardinal-components-api")
+        optional("modmenu")
+    }
+    modrinth {
+        projectId = "9OuwP2Qv"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add("${project.minecraft_version}")
+        requires("fabric-api")
+        requires("cloth-config")
+        requires("cardinal-components-api")
+        optional("modmenu")
+    }
+}
+
 // configure the maven publication
 publishing {
     publications {
         create("mavenJava", MavenPublication) {
             artifactId = project.archives_base_name
             from components.java
-        }
-    }
-
-    modrinth {
-        token = System.getenv("MODRINTH_TOKEN")
-        // Remember to have the MODRINTH_TOKEN environment variable set or else this will fail - just make sure it stays private!
-        projectId = "unseaworthy" // This can be the project ID or the slug. Either will work!
-        versionType = "release" // This is the default -- can also be `beta` or `alpha`
-        uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-        gameVersions = ["${project.minecraft_version}"] // Must be an array, even with only one version
-        dependencies { // A special DSL for creating dependencies
-            // scope.type
-            // The scope can be `required`, `optional`, `incompatible`, or `embedded`
-            // The type can either be `project` or `version`
-            //incompatible.project "tectonic"
-            required.project "fabric-api"
-            required.project "cloth-config"
-            required.project "cardinal-components-api"
-            optional.project "modmenu"
         }
     }
 

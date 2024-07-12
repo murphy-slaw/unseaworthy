@@ -1,8 +1,13 @@
+import org.jetbrains.changelog.Changelog
+
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
+    id 'org.jetbrains.changelog' version '2.2.1'
     id "me.modmuss50.mod-publish-plugin" version "0.5.2"
 }
+apply plugin: 'org.jetbrains.changelog'
+
 
 version = "${project.mod_version}+${minecraft_version}"
 group = project.maven_group
@@ -119,26 +124,43 @@ jar {
     }
 }
 
+
+changelog {
+    version = project.version
+    path = file("CHANGELOG.md").canonicalPath
+    groups = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+    lineSeparator = "\n"
+}
+
 publishMods {
     file = remapJar.archiveFile
-    changelog = "Hello!"
     type = STABLE
     modLoaders.add("fabric")
+    changelog = project.changelog.renderItem(project.changelog
+            .getLatest()
+            .withHeader(false)
+            .withEmptySections(false),
+            Changelog.OutputType.MARKDOWN
+    )
 
     curseforge {
         projectId = "1061972"
         projectSlug = "unseaworthy" // Required for discord webhook
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-        minecraftVersions.add("${project.minecraft_version}")
+        minecraftVersions.add(project.minecraft_version)
+        javaVersions.add(JavaVersion.VERSION_21)
+        clientRequired = true
+        serverRequired = true
         requires("fabric-api")
         requires("cloth-config")
         requires("cardinal-components-api")
         optional("modmenu")
     }
+
     modrinth {
         projectId = "9OuwP2Qv"
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-        minecraftVersions.add("${project.minecraft_version}")
+        minecraftVersions.add(project.minecraft_version)
         requires("fabric-api")
         requires("cloth-config")
         requires("cardinal-components-api")

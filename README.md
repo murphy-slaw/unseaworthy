@@ -9,6 +9,7 @@ they enter an ocean biome, they begin to be tossed by the sea and eventually bre
 
 - Boats deployed on water begin shaking and bouncing upon entering ocean biomes (any biome in the `c:is_ocean`  biome
   tag).
+- You can optionally set a minimum water depth for boats to sink in tagged biomes.
 - A configurable number of ticks later, the boat is wrecked.
 - The % chance of being wrecked each interval is configurable.
 - Wrecked boats can be configured to:

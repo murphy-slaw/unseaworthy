@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] 2024-10-07
+
+### Added
+
+- New configuration option - minimum water depth to sink boats. This allows you to permit boats to operate in shallower 
+waters of tagged biomes.
+
 ## [1.1.2] 2024-07-07
 
 ### Changed

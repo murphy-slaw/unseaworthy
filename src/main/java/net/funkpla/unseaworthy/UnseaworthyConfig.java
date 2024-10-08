@@ -24,6 +24,10 @@ public class UnseaworthyConfig implements ConfigData {
     @ConfigEntry.BoundedDiscrete(max = 100)
     public int breakChance = 100;
 
+    @Comment("Minimum water depth to sink boats.")
+    @ConfigEntry.BoundedDiscrete(min=0, max = 128)
+    public int minDepth = 0;
+
     @Comment("What happens to wrecked boats?")
     @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
     public BoatFate fate = BoatFate.DESTROY;

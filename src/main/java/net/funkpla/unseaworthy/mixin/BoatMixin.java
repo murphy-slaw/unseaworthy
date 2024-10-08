@@ -6,6 +6,7 @@ import net.funkpla.unseaworthy.UnseaworthyConfig;
 import net.funkpla.unseaworthy.component.SinkTimeComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.EntityType;
@@ -14,6 +15,8 @@ import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -100,7 +103,7 @@ public abstract class BoatMixin extends VehicleEntity {
             }
             this.sinkMultiplier = Mth.clamp(this.sinkMultiplier, 0.0F, 1.0F);
             this.bubbleAngleO = this.bubbleAngle;
-            this.bubbleAngle = 15.0F * (float) Math.sin((double) (0.5F * (float) this.level().getGameTime())) * this.sinkMultiplier;
+            this.bubbleAngle = 15.0F * (float) Math.sin((0.5F * (float) this.level().getGameTime())) * this.sinkMultiplier;
 
         } else if (this.shouldSink() && getStatus() != Boat.Status.UNDER_WATER) {
             if (!isSinking()) {
@@ -123,8 +126,36 @@ public abstract class BoatMixin extends VehicleEntity {
     }
 
     @Unique
+    public float getWaterLevelBelow() {
+        AABB aabb = this.getBoundingBox();
+        int minX = Mth.floor(aabb.minX);
+        int maxX = Mth.ceil(aabb.maxX);
+        int minY = Mth.floor(aabb.minY);
+        int minZ = Mth.floor(aabb.minZ);
+        int maxZ = Mth.ceil(aabb.maxZ);
+        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+        int curY = minY;
+        depthLoop: while(true){
+            for (int curX = minX; curX < maxX; ++curX){
+                for(int curZ = minZ; curZ< maxZ; ++curZ) {
+                    mutableBlockPos.set(curX, curY, curZ);
+                    FluidState fluidState = this.level().getFluidState(mutableBlockPos);
+                    if(!fluidState.is(FluidTags.WATER)) {
+                        break depthLoop;
+                    }
+                }
+            }
+            curY--;
+        }
+        return (float) minY - curY;
+    }
+
+    @Unique
     boolean shouldSink() {
-        return this.level().getBiome(blockPosition()).is(UnseaworthyCommon.SINKS_BOATS);
+        if (this.getWaterLevelBelow() >= config.minDepth) {
+            return this.level().getBiome(blockPosition()).is(UnseaworthyCommon.SINKS_BOATS);
+        }
+        return false;
     }
 
     @Unique

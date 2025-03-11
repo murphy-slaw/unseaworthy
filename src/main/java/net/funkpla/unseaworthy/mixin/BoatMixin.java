@@ -162,6 +162,7 @@ public abstract class BoatMixin extends Entity {
         return this.getWaterLevelBelow() >= config.minDepth && this.level().getBiome(blockPosition()).is(UnseaworthyCommon.SINKS_BOATS) && weatherBadEnough();
     }
 
+    @Unique
     boolean weatherBadEnough() {
         switch (config.weatherRequired) {
             case CLEAR -> {

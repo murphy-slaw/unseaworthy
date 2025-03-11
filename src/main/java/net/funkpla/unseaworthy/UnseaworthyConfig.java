@@ -17,6 +17,12 @@ public class UnseaworthyConfig implements ConfigData {
         SINK
     }
 
+    public enum WeatherRequired {
+        CLEAR,
+        RAINING,
+        THUNDERING
+    }
+
     @Comment("Interval between boat destruction checks (ticks)")
     public int interval = 100;
 
@@ -31,4 +37,8 @@ public class UnseaworthyConfig implements ConfigData {
     @Comment("What happens to wrecked boats?")
     @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
     public BoatFate fate = BoatFate.DESTROY;
+
+    @Comment("What weather is required for boats to sink?")
+    @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
+    public WeatherRequired weatherRequired  = WeatherRequired.CLEAR;
 }

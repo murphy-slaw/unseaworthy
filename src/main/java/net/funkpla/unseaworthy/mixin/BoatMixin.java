@@ -32,11 +32,9 @@ import static net.funkpla.unseaworthy.component.SinkTimeComponent.SINK_TIME;
 public abstract class BoatMixin extends VehicleEntity {
 
     @Unique
-    private final SinkTimeComponent sinkTime = SINK_TIME.get(this);
-
-    @Unique
     protected final UnseaworthyConfig config = AutoConfig.getConfigHolder(UnseaworthyConfig.class).getConfig();
-
+    @Unique
+    private final SinkTimeComponent sinkTime = SINK_TIME.get(this);
     @Unique
     private int bounceTimer = 0;
 
@@ -90,20 +88,24 @@ public abstract class BoatMixin extends VehicleEntity {
         }
     }
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;tickBubbleColumn()V"), method = "tick")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;tickBubbleColumn()V"),
+            method = "tick")
     private void tickSinking(CallbackInfo info) {
-        if (!getType().is(UnseaworthyCommon.SINKABLE_BOATS)) return;
+        if (!getType().is(UnseaworthyCommon.SINKABLE_BOATS))
+            return;
         int i = this.getSinkTime();
         if (this.level().isClientSide()) {
             if (i >= 0) {
                 this.sinkMultiplier += 0.01F;
-                if (this.random.nextInt(15) == 0) this.doWaterSplashEffect();
+                if (this.random.nextInt(15) == 0)
+                    this.doWaterSplashEffect();
             } else {
                 this.sinkMultiplier -= 0.1F;
             }
             this.sinkMultiplier = Mth.clamp(this.sinkMultiplier, 0.0F, 1.0F);
             this.bubbleAngleO = this.bubbleAngle;
-            this.bubbleAngle = 15.0F * (float) Math.sin((0.5F * (float) this.level().getGameTime())) * this.sinkMultiplier;
+            this.bubbleAngle =
+                    15.0F * (float) Math.sin((0.5F * (float) this.level().getGameTime())) * this.sinkMultiplier;
 
         } else if (this.shouldSink() && getStatus() != Boat.Status.UNDER_WATER) {
             if (!isSinking()) {
@@ -135,12 +137,13 @@ public abstract class BoatMixin extends VehicleEntity {
         int maxZ = Mth.ceil(aabb.maxZ);
         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
         int curY = minY;
-        depthLoop: while(true){
-            for (int curX = minX; curX < maxX; ++curX){
-                for(int curZ = minZ; curZ< maxZ; ++curZ) {
+        depthLoop:
+        while (true) {
+            for (int curX = minX; curX < maxX; ++curX) {
+                for (int curZ = minZ; curZ < maxZ; ++curZ) {
                     mutableBlockPos.set(curX, curY, curZ);
                     FluidState fluidState = this.level().getFluidState(mutableBlockPos);
-                    if(!fluidState.is(FluidTags.WATER)) {
+                    if (!fluidState.is(FluidTags.WATER)) {
                         break depthLoop;
                     }
                 }
@@ -152,8 +155,22 @@ public abstract class BoatMixin extends VehicleEntity {
 
     @Unique
     boolean shouldSink() {
-        if (this.getWaterLevelBelow() >= config.minDepth) {
-            return this.level().getBiome(blockPosition()).is(UnseaworthyCommon.SINKS_BOATS);
+        return this.getWaterLevelBelow() >= config.minDepth && this.level().getBiome(blockPosition()).is(UnseaworthyCommon.SINKS_BOATS) && weatherBadEnough();
+    }
+
+    boolean weatherBadEnough() {
+        switch (config.weatherRequired) {
+            case CLEAR -> {
+                return true;
+            }
+            case RAINING -> {
+                if (this.level().isRaining())
+                    return true;
+            }
+            case THUNDERING -> {
+                if (this.level().isThundering())
+                    return true;
+            }
         }
         return false;
     }
@@ -174,14 +191,16 @@ public abstract class BoatMixin extends VehicleEntity {
         Vec3 vec3 = this.getDeltaMovement();
         float jitterX = (this.random.nextFloat() - 0.5F) * 0.2F;
         float jitterZ = (this.random.nextFloat() - 0.5F) * 0.2F;
-        this.setDeltaMovement(vec3.x + (vec3.x * jitterX), vec3.y + (0.1 * this.random.nextInt(3, 5)), vec3.z + jitterZ);
+        this.setDeltaMovement(vec3.x + (vec3.x * jitterX), vec3.y + (0.1 * this.random.nextInt(3, 5)),
+                vec3.z + jitterZ);
         this.setYRot(this.getYRot() + ((this.random.nextFloat() - 0.5F) * 90));
     }
 
     @Unique
     private void sink() {
         if (isSinking()) {
-            this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+            this.level().playSound(this, BlockPos.containing(this.position()), SoundEvents.PLAYER_SPLASH_HIGH_SPEED,
+                    this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
             if (config.fate == UnseaworthyConfig.BoatFate.DESTROY) {
                 this.kill();
                 int spawnCount = this.random.nextInt(3, 5);

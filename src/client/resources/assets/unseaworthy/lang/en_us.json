@@ -3,5 +3,6 @@
   "text.autoconfig.unseaworthy.option.interval": "Destruction check interval (ticks)",
   "text.autoconfig.unseaworthy.option.breakChance": "Chance boat will wreck (%)",
   "text.autoconfig.unseaworthy.option.minDepth": "Minimum water depth to wreck boats",
-  "text.autoconfig.unseaworthy.option.fate": "Fate of wrecked boats"
+  "text.autoconfig.unseaworthy.option.fate": "Fate of wrecked boats",
+  "text.autoconfig.unseaworthy.option.weatherRequired": "Weather required to sink boats"
 }

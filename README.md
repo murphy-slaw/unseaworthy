@@ -16,6 +16,7 @@ they enter an ocean biome, they begin to be tossed by the sea and eventually bre
     - SINK: boat is pulled underwater and ejects passengers
     - BREAK: boat is broken and drops its item entity
     - DESTROY: boat is destroyed and drops a random number of planks and sticks
+- Optionally set a weather requirement so that boats only sink when it is raining or thundering.
 
 ## Datapack Stuff
 

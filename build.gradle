@@ -23,6 +23,8 @@ publishMods {
             .withEmptySections(false),
             Changelog.OutputType.MARKDOWN
     )
+
+
 /*
     curseforge {
         projectId = ""
@@ -42,17 +44,16 @@ publishMods {
         minecraftVersions.add(minecraft_version)
         requires("cloth-config")
     }
-
     modrinth("modrinthFabric") {
         from mrOptions
-        file project(":fabric")
         modLoaders.add("fabric")
+        file = tasks.getByPath(":fabric:remapJar").outputs.files.singleFile
         optional("modmenu")
     }
 
-    modrinth("modrinthForge") {
+    modrinth("modrinthNeoForge") {
         from mrOptions
-        file project(":neoforge")
+        file = tasks.findByPath(":neoforge:jar").outputs.files.singleFile
         modLoaders.add("neoforge")
     }
 }

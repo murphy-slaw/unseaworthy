@@ -1,0 +1,46 @@
+{
+    "schemaVersion": 1,
+    "id": "unseaworthy",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "sources": "https://github.com/murphy_slaw/unseaworthy"
+    },
+    "license": "${license}",
+    "icon": "${mod_id}.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "net.funkpla.unseaworthy.UnseaworthyModFabric"
+        ],
+        "modmenu": [
+            "net.funkpla.unseaworthy.ModMenuConfig"
+        ],
+        "cardinal-components": [
+            "net.funkpla.unseaworthy.component.ComponentInitializer"
+        ]
+    },
+    "custom": {
+        "cardinal-components": [
+            "unseaworthy:sink_time"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14",
+        "fabric": "*",
+        "minecraft": "${minecraft_version}",
+        "java": ">=17"
+    },
+    "suggests": {
+        "another-mod": "*"
+    }
+}
+  

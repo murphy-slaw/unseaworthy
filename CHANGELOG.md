@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Ported to MultiLoaderTemplate
-- First Forge release
+- First release for Forge and NeoForge
 
 ## [1.3.0] 2025-03-11
 
